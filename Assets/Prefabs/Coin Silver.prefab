@@ -4999,7 +4999,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 1
-  value: 50
+  value: 8
 --- !u!1 &9051043504024471144
 GameObject:
   m_ObjectHideFlags: 0
