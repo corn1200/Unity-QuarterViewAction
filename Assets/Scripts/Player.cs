@@ -5,9 +5,19 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public float speed;
-
     public GameObject[] weapons;
     public bool[] hasWeapons;
+    public GameObject[] grenades;
+    public int hasGrenades;
+
+    public int ammo;
+    public int coin;
+    public int headlth;
+
+    public int maxAmmo;
+    public int maxCoin;
+    public int maxHealth;
+    public int maxHasGrenades;
 
     float horizonAxis;
     float verticalAxis;
@@ -196,6 +206,47 @@ public class Player : MonoBehaviour
         {
             animator.SetBool("isJumping", false);
             isJumping = false;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == "Item")
+        {
+            Item item = other.GetComponent<Item>();
+            switch(item.type)
+            {
+                case Item.Type.Ammo:
+                    ammo += item.value;
+                    if(ammo > maxAmmo)
+                    {
+                        ammo = maxAmmo;
+                    }
+                    break;
+                case Item.Type.Coin:
+                    coin += item.value;
+                    if (coin > maxCoin)
+                    {
+                        coin = maxCoin;
+                    }
+                    break;
+                case Item.Type.Heart:
+                    headlth += item.value;
+                    if (headlth > maxHealth)
+                    {
+                        headlth = maxHealth;
+                    }
+                    break;
+                case Item.Type.Grenade:
+                    grenades[hasGrenades].SetActive(true);
+                    hasGrenades += item.value;
+                    if (hasGrenades > maxHasGrenades)
+                    {
+                        hasGrenades = maxHasGrenades;
+                    }
+                    break;
+            }
+            Destroy(other.gameObject);
         }
     }
 
