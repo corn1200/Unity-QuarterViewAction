@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
     public bool[] hasWeapons;
     public GameObject[] grenades;
     public int hasGrenades;
+    public Camera followCamera;
 
     public int ammo;
     public int coin;
@@ -35,6 +36,8 @@ public class Player : MonoBehaviour
 
     bool isFire;
     bool isFireReady = true;
+    bool isReload;
+    bool isReloading;
 
     Vector3 moveVec;
     Vector3 dodgeVec;
@@ -62,6 +65,7 @@ public class Player : MonoBehaviour
         Turn();
         Jump();
         Attack();
+        Reload();
         Dodge();
         Swap();
         Interaction();
@@ -73,7 +77,8 @@ public class Player : MonoBehaviour
         verticalAxis = Input.GetAxisRaw("Vertical");
         isWalk = Input.GetButton("Walk");
         isJump = Input.GetButtonDown("Jump");
-        isFire = Input.GetButtonDown("Fire1");
+        isFire = Input.GetButton("Fire1");
+        isReload = Input.GetButtonDown("Reload");
         isInteraction = Input.GetButtonDown("Interaction");
         isSwap1 = Input.GetButtonDown("Swap1");
         isSwap2 = Input.GetButtonDown("Swap2");
@@ -92,7 +97,7 @@ public class Player : MonoBehaviour
         {
             transform.position += moveVec * speed * 0.3f * Time.deltaTime;
         }
-        if (isSwaping || !isFireReady)
+        if (isSwaping || isReloading || !isFireReady)
         {
             moveVec = Vector3.zero;
         }
@@ -108,6 +113,18 @@ public class Player : MonoBehaviour
     void Turn()
     {
         transform.LookAt(transform.position + moveVec);
+
+        if (isFire)
+        {
+            Ray ray = followCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit raycastHit;
+            if (Physics.Raycast(ray, out raycastHit, 100))
+            {
+                Vector3 nextVec = raycastHit.point - transform.position;
+                nextVec.y = 0;
+                transform.LookAt(transform.position + nextVec);
+            }
+        }
     }
 
     void Jump()
@@ -123,19 +140,50 @@ public class Player : MonoBehaviour
 
     void Attack()
     {
-        if(equipWeapon == null)
+        if (equipWeapon == null)
         {
             return;
         }
         fireDelay += Time.deltaTime;
         isFireReady = equipWeapon.rate < fireDelay;
 
-        if(isFire && isFireReady && !isDodge && !isSwaping)
+        if (isFire && isFireReady && !isDodge && !isSwaping)
         {
             equipWeapon.Use();
-            animator.SetTrigger("doSwing");
+            animator.SetTrigger(equipWeapon.type == Weapon.Type.Melee ? "doSwing" : "doShot");
             fireDelay = 0;
         }
+    }
+
+    void Reload()
+    {
+        if (equipWeapon == null)
+        {
+            return;
+        }
+        if (equipWeapon.type == Weapon.Type.Melee)
+        {
+            return;
+        }
+        if (ammo == 0)
+        {
+            return;
+        }
+        if (isReload && !isJump && !isDodge && !isSwaping && isFireReady)
+        {
+            animator.SetTrigger("doReload");
+            isReloading = true;
+
+            Invoke("ReloadOut", 3f);
+        }
+    }
+
+    void ReloadOut()
+    {
+        int reAmmo = ammo < equipWeapon.maxAmmo ? ammo : equipWeapon.maxAmmo;
+        equipWeapon.currentAmmo = reAmmo;
+        ammo -= reAmmo;
+        isReload = false;
     }
 
     void Dodge()
@@ -159,7 +207,7 @@ public class Player : MonoBehaviour
 
     void Swap()
     {
-        if(isSwap1 && (!hasWeapons[0] || equipWeaponIndex == 0))
+        if (isSwap1 && (!hasWeapons[0] || equipWeaponIndex == 0))
         {
             return;
         }
@@ -235,14 +283,14 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Item")
+        if (other.tag == "Item")
         {
             Item item = other.GetComponent<Item>();
-            switch(item.type)
+            switch (item.type)
             {
                 case Item.Type.Ammo:
                     ammo += item.value;
-                    if(ammo > maxAmmo)
+                    if (ammo > maxAmmo)
                     {
                         ammo = maxAmmo;
                     }
