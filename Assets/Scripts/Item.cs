@@ -8,8 +8,26 @@ public class Item : MonoBehaviour
     public Type type;
     public int value;
 
+    Rigidbody rigidbody;
+    SphereCollider sphereCollider;
+
+    private void Awake()
+    {
+        rigidbody = GetComponent<Rigidbody>();
+        sphereCollider = GetComponent<SphereCollider>();
+    }
+
     private void Update()
     {
-        transform.Rotate(Vector3.up * 10 * Time.deltaTime);
+        transform.Rotate(Vector3.up * 20 * Time.deltaTime);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Floor")
+        {
+            rigidbody.isKinematic = true;
+            sphereCollider.enabled = false;
+        }
     }
 }
