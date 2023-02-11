@@ -1,21 +1,58 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
     public int maxHealth;
     public int currentHealth;
+    public Transform target;
+    public bool isChase;
 
     Rigidbody rigidbody;
     BoxCollider boxCollider;
     Material material;
+    NavMeshAgent navMeshAgent;
+    Animator animator;
 
     private void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
         boxCollider = GetComponent<BoxCollider>();
-        material = GetComponent<MeshRenderer>().material;
+        material = GetComponentInChildren<MeshRenderer>().material;
+        navMeshAgent = GetComponent<NavMeshAgent>();
+        animator = GetComponentInChildren<Animator>();
+
+        Invoke("ChaseStart", 2);
+    }
+
+    void ChaseStart()
+    {
+        isChase = true;
+        animator.SetBool("isWalk", true);
+    }
+
+    private void Update()
+    {
+        if (isChase)
+        {
+            navMeshAgent.SetDestination(target.position);
+        }
+    }
+
+    void FreezeVelocity()
+    {
+        if (isChase)
+        {
+            rigidbody.velocity = Vector3.zero;
+            rigidbody.angularVelocity = Vector3.zero;
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        FreezeVelocity();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -59,6 +96,9 @@ public class Enemy : MonoBehaviour
         {
             material.color = Color.gray;
             gameObject.layer = 12;
+            isChase = false;
+            navMeshAgent.enabled = false;
+            animator.SetTrigger("doDie");
 
             if (isGrenade)
             {

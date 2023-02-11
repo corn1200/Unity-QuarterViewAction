@@ -102,7 +102,7 @@ public class Player : MonoBehaviour
         {
             moveVec = Vector3.zero;
         }
-        if(!isBorder)
+        if (!isBorder)
         {
             if (isWalk)
             {
@@ -148,11 +148,11 @@ public class Player : MonoBehaviour
 
     void Grenade()
     {
-        if(hasGrenades == 0)
+        if (hasGrenades == 0)
         {
             return;
         }
-        if(isGrenade && !isReload && !isSwaping)
+        if (isGrenade && !isReload && !isSwaping)
         {
             Ray ray = followCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit raycastHit;
