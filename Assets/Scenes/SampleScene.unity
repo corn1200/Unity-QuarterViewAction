@@ -2409,6 +2409,7 @@ MonoBehaviour:
   - {fileID: 110183315}
   - {fileID: 1717584747}
   hasGrenades: 0
+  grenadeObj: {fileID: 8495883471884581513, guid: f6c8fb30f418508489be52fc0f8c95ca, type: 3}
   followCamera: {fileID: 963194227}
   ammo: 0
   coin: 0
@@ -3735,6 +3736,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4990298128191126360, guid: 778e5b7abf06fb34f8d2944f7760388b, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4990298128191126361, guid: 778e5b7abf06fb34f8d2944f7760388b, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6337888885722975636, guid: 778e5b7abf06fb34f8d2944f7760388b, type: 3}
       propertyPath: m_Name
       value: Weapon Hammer

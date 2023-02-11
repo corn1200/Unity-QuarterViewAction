@@ -20,12 +20,12 @@ public class Weapon : MonoBehaviour
 
     public void Use()
     {
-        if(type == Type.Melee)
+        if (type == Type.Melee)
         {
             StopCoroutine("Swing");
             StartCoroutine("Swing");
         }
-        else if(type == Type.Range && currentAmmo > 0)
+        else if (type == Type.Range && currentAmmo > 0)
         {
             currentAmmo--;
             StartCoroutine("Shot");
