@@ -14,7 +14,7 @@ public class Player : MonoBehaviour
 
     public int ammo;
     public int coin;
-    public int headlth;
+    public int health;
 
     public int maxAmmo;
     public int maxCoin;
@@ -41,12 +41,14 @@ public class Player : MonoBehaviour
     bool isReload;
     bool isReloading;
     bool isBorder;
+    bool isDamage;
 
     Vector3 moveVec;
     Vector3 dodgeVec;
 
     Rigidbody rigidBody;
     Animator animator;
+    MeshRenderer[] meshRenderers;
 
     GameObject nearObject;
     Weapon equipWeapon;
@@ -59,6 +61,7 @@ public class Player : MonoBehaviour
     {
         rigidBody = GetComponent<Rigidbody>();
         animator = GetComponentInChildren<Animator>();
+        meshRenderers = GetComponentsInChildren<MeshRenderer>();
     }
 
     void Update()
@@ -354,10 +357,10 @@ public class Player : MonoBehaviour
                     }
                     break;
                 case Item.Type.Heart:
-                    headlth += item.value;
-                    if (headlth > maxHealth)
+                    health += item.value;
+                    if (health > maxHealth)
                     {
-                        headlth = maxHealth;
+                        health = maxHealth;
                     }
                     break;
                 case Item.Type.Grenade:
@@ -370,6 +373,38 @@ public class Player : MonoBehaviour
                     break;
             }
             Destroy(other.gameObject);
+        }
+        else if(other.tag == "EnemyBullet")
+        {
+            if(!isDamage)
+            {
+                Bullet enemyBullet = other.GetComponent<Bullet>();
+                health -= enemyBullet.damage;
+
+                if(other.GetComponent<Rigidbody>() != null)
+                {
+                    Destroy(other.gameObject);
+                }
+
+                StartCoroutine(OnDamage());
+            }
+        }
+    }
+
+    IEnumerator OnDamage()
+    {
+        isDamage = true;
+        foreach(MeshRenderer mesh in meshRenderers)
+        {
+            mesh.material.color = Color.yellow;
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        isDamage = false;
+        foreach(MeshRenderer mesh in meshRenderers)
+        {
+            mesh.material.color = Color.white;
         }
     }
 
