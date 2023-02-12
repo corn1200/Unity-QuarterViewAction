@@ -374,37 +374,48 @@ public class Player : MonoBehaviour
             }
             Destroy(other.gameObject);
         }
-        else if(other.tag == "EnemyBullet")
+        else if (other.tag == "EnemyBullet")
         {
-            if(!isDamage)
+            if (!isDamage)
             {
                 Bullet enemyBullet = other.GetComponent<Bullet>();
                 health -= enemyBullet.damage;
 
-                if(other.GetComponent<Rigidbody>() != null)
-                {
-                    Destroy(other.gameObject);
-                }
+                bool isBossAtk = other.name == "Boss Melee Area";
+                StartCoroutine(OnDamage(isBossAtk));
+            }
 
-                StartCoroutine(OnDamage());
+            if (other.GetComponent<Rigidbody>() != null)
+            {
+                Destroy(other.gameObject);
             }
         }
     }
 
-    IEnumerator OnDamage()
+    IEnumerator OnDamage(bool isBossAtk)
     {
         isDamage = true;
-        foreach(MeshRenderer mesh in meshRenderers)
+        foreach (MeshRenderer mesh in meshRenderers)
         {
             mesh.material.color = Color.yellow;
+        }
+
+        if (isBossAtk)
+        {
+            rigidBody.AddForce(transform.forward * -25, ForceMode.Impulse);
         }
 
         yield return new WaitForSeconds(1f);
 
         isDamage = false;
-        foreach(MeshRenderer mesh in meshRenderers)
+        foreach (MeshRenderer mesh in meshRenderers)
         {
             mesh.material.color = Color.white;
+        }
+
+        if (isBossAtk)
+        {
+            rigidBody.velocity = Vector3.zero;
         }
     }
 
